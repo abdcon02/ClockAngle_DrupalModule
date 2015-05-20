@@ -1,0 +1,5 @@
+name = Clock Angle
+description = Takes an hour and minute and returns the angle betwix the two clock hands.
+package = Epicodus Examples
+core = 7.x
+files[] = clock.module

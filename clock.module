@@ -1,0 +1,70 @@
+<?php
+
+function clock_menu() {
+    //create the form to input data
+    $items['clock_form'] = array(
+        'title' => 'Clock Angle Calculator',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('find_angle'),
+        'access callback' => TRUE,
+        'type' => MENU_NORMAL_ITEM,
+    );
+    //create the success page to display the results
+    $items['clock_results'] = array(
+        'title' => 'Results',
+        'page callback' => 'clock_angle_calc',
+        'access callback' => TRUE,
+        'type' => MENU_CALLBACK,
+    );
+
+    return $items;
+}
+
+function find_angle() {
+
+    $form['input'] = array(
+        '#title' => 'Input Time',
+        '#type' => 'textfield',
+        '#description' => t('Input a time in the hh:mm format.')
+    );
+
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => 'Calculate'
+    );
+
+    return $form;
+}
+
+function find_angle_submit($form, &$form_state) {
+
+    $input = $form_state['values']['input'];
+    $_SESSION['clock_time'] = $input;
+
+    $form_state['redirect'] = 'clock_results';
+}
+
+function clock_angle_calc() {
+    $input = $_SESSION['clock_time'];
+
+    if(preg_match("/[^0-9:]/", $input)) {
+        return 'Invalid characters!';
+    }
+
+    $time_array = explode(":", $input);
+
+    if($time_array[0] > 12 || $time_array[0] < 0 || $time_array[1] > 60 || $time_array[1] < 0) {
+        return 'You trying to pull one over on me, buddy? ';
+    }
+
+    $hour = ($time_array[0] % 12) * 30 + ($time_array[1] * 0.5);
+    $min = $time_array[1] * 6;
+
+    $angle = abs($hour - $min);
+
+    if($angle > 180) {
+        $angle = 360 - $angle;
+    }
+
+    return 'Your clock will have a degree of separation of: ' . $angle . '&deg;';
+}
